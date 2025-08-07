@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Pokemon List</title>
+    <style>
+        img {
+            width: 100px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<span th:each="dex : ${numbers}">
+    <img th:id="'pokemon-' + ${dex}"
+         th:src="@{'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/' + ${dex} + '.png'}"
+         th:attr="data-id=${dex}, data-clicked='false'"
+         onmouseover="swapImage(this)"
+         onmouseout="restoreImage(this)"
+         onclick="toggleImage(this)"
+         alt="Pokemon"/>
+</span>
+
+<script>
+
+    function getClickedDexFromCookie() {
+        const cookie = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('clickedDex='));
+        return cookie ? cookie.split('=')[1].split(',') : [];
+    }
+
+    function setClickedDexToCookie(dexList) {
+        const value = dexList.join(',');
+        const maxAge = 60 * 60 * 24 * 365 * 100; // 100년
+        document.cookie = `clickedDex=${value}; max-age=${maxAge}; path=/`;
+    }
+
+    function getNormalImageUrl(id) {
+        return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${id}.png`;
+    }
+
+    function getAlternateImageUrl(id) {
+        return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/${id}.png`;
+    }
+
+    function swapImage(img) {
+        if (img.getAttribute("data-clicked") === "true") return;
+        const id = img.getAttribute("data-id");
+        img.src = getAlternateImageUrl(id);
+    }
+
+    function restoreImage(img) {
+        if (img.getAttribute("data-clicked") === "true") return;
+        const id = img.getAttribute("data-id");
+        img.src = getNormalImageUrl(id);
+    }
+
+    function toggleImage(img) {
+        const id = img.getAttribute("data-id");
+        let clickedList = getClickedDexFromCookie();
+
+        if (img.getAttribute("data-clicked") === "true") {
+            // 되돌리기
+            img.setAttribute("data-clicked", "false");
+            img.src = getNormalImageUrl(id);
+            clickedList = clickedList.filter(d => d !== id);
+        } else {
+            // 고정하기
+            img.setAttribute("data-clicked", "true");
+            img.src = getAlternateImageUrl(id);
+            if (!clickedList.includes(id)) {
+                clickedList.push(id);
+            }
+        }
+
+        setClickedDexToCookie(clickedList);
+    }
+
+    window.onload = function () {
+        const clickedList = getClickedDexFromCookie();
+        clickedList.forEach(id => {
+            const img = document.querySelector(`img[data-id='${id}']`);
+            if (img) {
+                img.setAttribute("data-clicked", "true");
+                img.src = getAlternateImageUrl(id);
+            }
+        });
+    };
+</script>
+</body>
+</html>
