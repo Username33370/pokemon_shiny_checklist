@@ -2,9 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Pokemon Viewer</title>
+    <style>
+        img {
+            width: 100px;
+        }
+    </style>
 </head>
 <body>
+
+<img id="pokemon-image" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/25.png" alt="Pokemon Image"> <br>
+<input type="number" name="dex" id="dex-input" min="1"> <br>
+<button onclick="changeImage()">Search</button>
+
+<script>
+    function changeImage() {
+        const dexNumber = document.getElementById('dex-input').value;
+        const image = document.getElementById('pokemon-image');
+
+        if (dexNumber > 0 && dexNumber < 1026) {
+            image.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/${dexNumber}.png`;
+        } else {
+            alert("Please enter a valid Dex number.");
+        }
+    }
+</script>
 
 </body>
 </html>
