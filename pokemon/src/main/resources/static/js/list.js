@@ -1,29 +1,4 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
-<head>
-    <meta charset="UTF-8">
-    <title>Pokemon List</title>
-    <style>
-        img {
-            width: 100px;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-<span th:each="dex : ${numbers}">
-    <img th:id="'pokemon-' + ${dex}"
-         th:src="@{'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/' + ${dex} + '.png'}"
-         th:attr="data-id=${dex}, data-clicked='false'"
-         onmouseover="swapImage(this)"
-         onmouseout="restoreImage(this)"
-         onclick="toggleImage(this)"
-         alt="Pokemon"/>
-</span>
-
-<script>
-
-    function getClickedDexFromCookie() {
+function getClickedDexFromCookie() {
         const cookie = document.cookie
             .split('; ')
             .find(row => row.startsWith('clickedDex='));
@@ -85,6 +60,3 @@
             }
         });
     };
-</script>
-</body>
-</html>
