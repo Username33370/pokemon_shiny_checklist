@@ -23,4 +23,11 @@ public class PokemonController {
     public String hunting() {
         return "hunting";
     }
+
+    @GetMapping("/uncaught")
+    public String uncaught(Model model) {
+        List<Integer> numbers = IntStream.rangeClosed(1,1025).boxed().collect(Collectors.toList());
+        model.addAttribute("numbers",numbers);
+        return "uncaught";
+    }
 }

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <title>Uncaught List</title>
+  <style>
+    img {
+        width: 100px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: border 0.2s ease;
+    }
+
+    .clicked {
+        border: 2px solid blue;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Thymeleaf-generated images -->
+<span th:each="dex : ${numbers}">
+    <img th:id="'pokemon-' + ${dex}"
+         th:src="@{'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/' + ${dex} + '.png'}"
+         th:attr="data-id=${dex}, data-clicked='false'"
+         onmouseover="swapImage(this)"
+         onmouseout="restoreImage(this)"
+         onclick="toggleImage(this)"
+         alt="Pokemon" />
+</span>
+
+<script>
+  function getClickedDexFromCookie() {
+      const cookieEntry = document.cookie
+          .split('; ')
+          .find(row => row.startsWith('clickedDex='));
+      if (!cookieEntry) return [];
+
+      try {
+          const rawValue = decodeURIComponent(cookieEntry.split('=')[1]);
+          return rawValue.split(',').filter(id => id && id !== 'undefined');
+      } catch (e) {
+          return [];
+      }
+  }
+
+  function setClickedDexToCookie(dexList) {
+      // Remove duplicates before saving
+      const uniqueList = Array.from(new Set(dexList));
+      const value = encodeURIComponent(uniqueList.join(','));
+      const maxAge = 60 * 60 * 24 * 365 * 100; // 100 years
+      document.cookie = `clickedDex=${value}; max-age=${maxAge}; path=/`;
+  }
+
+  function getNormalImageUrl(id) {
+      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${id}.png`;
+  }
+
+  function getAlternateImageUrl(id) {
+      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/${id}.png`;
+  }
+
+  function swapImage(img) {
+      if (img.getAttribute("data-clicked") === "true") return;
+      const id = img.getAttribute("data-id");
+      img.src = getAlternateImageUrl(id);
+  }
+
+  function restoreImage(img) {
+      if (img.getAttribute("data-clicked") === "true") return;
+      const id = img.getAttribute("data-id");
+      img.src = getNormalImageUrl(id);
+  }
+
+  function toggleImage(img) {
+    const id = img.getAttribute("data-id");
+    let clickedList = getClickedDexFromCookie();
+
+    if (img.getAttribute("data-clicked") === "true") {
+        // Unselect (make it visible again if ever needed)
+        img.setAttribute("data-clicked", "false");
+        img.classList.remove("clicked");
+        clickedList = clickedList.filter(d => d !== id);
+    } else {
+        // Select and hide
+        img.setAttribute("data-clicked", "true");
+        img.classList.add("clicked");
+        img.style.display = "none"; // Hide the image
+        clickedList.push(id);
+    }
+
+    setClickedDexToCookie(clickedList);
+}
+
+
+  window.onload = function () {
+    const clickedList = getClickedDexFromCookie();
+
+    clickedList.forEach(id => {
+        const img = document.querySelector(`img[data-id='${id}']`);
+        if (img) {
+            img.setAttribute("data-clicked", "true");
+            img.classList.add("clicked");
+            img.style.display = "none"; // Hide on page load if previously clicked
+        }
+    });
+};
+
+</script>
+
+</body>
+</html>
