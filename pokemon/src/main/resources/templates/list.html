@@ -1,25 +1,43 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
     <title>Pokemon List</title>
-    <style>
-        img {
-            width: 100px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: border 0.2s ease;
-        }
-
-        .clicked {
-            border: 2px solid blue;
-        }
-    </style>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="/css/list.css" rel="stylesheet" />
 </head>
 <body>
-
-<!-- Thymeleaf-generated images -->
-<span th:each="dex : ${numbers}">
+<!-- Responsive navbar-->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">Pokeirochi</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/pokemon/list">List</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Dropdown</a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="/pokemon/hunting">Hunting</a></li>
+                        <li><a class="dropdown-item" href="/pokemon/uncaught">Uncaught</a></li>
+                        <li><hr class="dropdown-divider" /></li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<!-- Page content-->
+<div class="container">
+    <div class="text-center mt-5">
+        <p><span th:each="dex : ${numbers}">
     <img th:id="'pokemon-' + ${dex}"
          th:src="@{'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/' + ${dex} + '.png'}"
          th:attr="data-id=${dex}, data-clicked='false'"
@@ -27,85 +45,12 @@
          onmouseout="restoreImage(this)"
          onclick="toggleImage(this)"
          alt="Pokemon" />
-</span>
-
-<script>
-    function getClickedDexFromCookie() {
-        const cookieEntry = document.cookie
-            .split('; ')
-            .find(row => row.startsWith('clickedDex='));
-        if (!cookieEntry) return [];
-
-        try {
-            const rawValue = decodeURIComponent(cookieEntry.split('=')[1]);
-            return rawValue.split(',').filter(id => id && id !== 'undefined');
-        } catch (e) {
-            return [];
-        }
-    }
-
-    function setClickedDexToCookie(dexList) {
-        // Remove duplicates before saving
-        const uniqueList = Array.from(new Set(dexList));
-        const value = encodeURIComponent(uniqueList.join(','));
-        const maxAge = 60 * 60 * 24 * 365 * 100; // 100 years
-        document.cookie = `clickedDex=${value}; max-age=${maxAge}; path=/`;
-    }
-
-    function getNormalImageUrl(id) {
-        return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${id}.png`;
-    }
-
-    function getAlternateImageUrl(id) {
-        return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/${id}.png`;
-    }
-
-    function swapImage(img) {
-        if (img.getAttribute("data-clicked") === "true") return;
-        const id = img.getAttribute("data-id");
-        img.src = getAlternateImageUrl(id);
-    }
-
-    function restoreImage(img) {
-        if (img.getAttribute("data-clicked") === "true") return;
-        const id = img.getAttribute("data-id");
-        img.src = getNormalImageUrl(id);
-    }
-
-    function toggleImage(img) {
-        const id = img.getAttribute("data-id");
-        let clickedList = getClickedDexFromCookie();
-
-        if (img.getAttribute("data-clicked") === "true") {
-            // Unselect
-            img.setAttribute("data-clicked", "false");
-            img.src = getNormalImageUrl(id);
-            img.classList.remove("clicked");
-            clickedList = clickedList.filter(d => d !== id);
-        } else {
-            // Select
-            img.setAttribute("data-clicked", "true");
-            img.src = getAlternateImageUrl(id);
-            img.classList.add("clicked");
-            clickedList.push(id);
-        }
-
-        setClickedDexToCookie(clickedList);
-    }
-
-    window.onload = function () {
-        const clickedList = getClickedDexFromCookie();
-
-        clickedList.forEach(id => {
-            const img = document.querySelector(`img[data-id='${id}']`);
-            if (img) {
-                img.setAttribute("data-clicked", "true");
-                img.src = getAlternateImageUrl(id);
-                img.classList.add("clicked");
-            }
-        });
-    };
-</script>
-
+</span></p>
+    </div>
+</div>
+<!-- Bootstrap core JS-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Core theme JS-->
+<script src="/js/list.js"></script>
 </body>
 </html>

@@ -1,13 +1,22 @@
 function getClickedDexFromCookie() {
-        const cookie = document.cookie
+        const cookieEntry = document.cookie
             .split('; ')
             .find(row => row.startsWith('clickedDex='));
-        return cookie ? cookie.split('=')[1].split(',') : [];
+        if (!cookieEntry) return [];
+
+        try {
+            const rawValue = decodeURIComponent(cookieEntry.split('=')[1]);
+            return rawValue.split(',').filter(id => id && id !== 'undefined');
+        } catch (e) {
+            return [];
+        }
     }
 
     function setClickedDexToCookie(dexList) {
-        const value = dexList.join(',');
-        const maxAge = 60 * 60 * 24 * 365 * 100; // 100년
+        // Remove duplicates before saving
+        const uniqueList = Array.from(new Set(dexList));
+        const value = encodeURIComponent(uniqueList.join(','));
+        const maxAge = 60 * 60 * 24 * 365 * 100; // 100 years
         document.cookie = `clickedDex=${value}; max-age=${maxAge}; path=/`;
     }
 
@@ -36,15 +45,17 @@ function getClickedDexFromCookie() {
         let clickedList = getClickedDexFromCookie();
 
         if (img.getAttribute("data-clicked") === "true") {
+            // Unselect
             img.setAttribute("data-clicked", "false");
             img.src = getNormalImageUrl(id);
+            img.classList.remove("clicked");
             clickedList = clickedList.filter(d => d !== id);
         } else {
+            // Select
             img.setAttribute("data-clicked", "true");
             img.src = getAlternateImageUrl(id);
-            if (!clickedList.includes(id)) {
-                clickedList.push(id);
-            }
+            img.classList.add("clicked");
+            clickedList.push(id);
         }
 
         setClickedDexToCookie(clickedList);
@@ -52,11 +63,13 @@ function getClickedDexFromCookie() {
 
     window.onload = function () {
         const clickedList = getClickedDexFromCookie();
+
         clickedList.forEach(id => {
             const img = document.querySelector(`img[data-id='${id}']`);
             if (img) {
                 img.setAttribute("data-clicked", "true");
                 img.src = getAlternateImageUrl(id);
+                img.classList.add("clicked");
             }
         });
     };
