@@ -50,16 +50,24 @@ function getClickedDexFromCookie() {
             img.src = getNormalImageUrl(id);
             img.classList.remove("clicked");
             clickedList = clickedList.filter(d => d !== id);
+
+            // Remove individual caught cookie
+            document.cookie = `caught_${id}=; max-age=0; path=/`;
         } else {
             // Select
             img.setAttribute("data-clicked", "true");
             img.src = getAlternateImageUrl(id);
             img.classList.add("clicked");
             clickedList.push(id);
+
+            // Set individual caught cookie
+            const maxAge = 60 * 60 * 24 * 365 * 100; // 100 years
+            document.cookie = `caught_${id}=true; max-age=${maxAge}; path=/`;
         }
 
         setClickedDexToCookie(clickedList);
     }
+
 
     window.onload = function () {
         const clickedList = getClickedDexFromCookie();
