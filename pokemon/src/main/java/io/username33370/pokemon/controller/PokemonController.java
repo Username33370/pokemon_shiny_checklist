@@ -30,4 +30,7 @@ public class PokemonController {
         model.addAttribute("numbers",numbers);
         return "uncaught";
     }
+
+    @GetMapping("/sos")
+    public String sos() { return "sos"; }
 }
